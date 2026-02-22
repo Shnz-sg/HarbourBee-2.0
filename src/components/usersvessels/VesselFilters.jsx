@@ -1,0 +1,62 @@
+import React from "react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Search, X } from "lucide-react";
+
+const VESSEL_TYPES = ["bulk_carrier", "tanker", "container", "general_cargo", "offshore", "passenger", "other"];
+
+export default function VesselFilters({ filters, onFilterChange }) {
+  const hasActiveFilters = filters.type !== "all" || filters.status !== "all" || filters.search;
+
+  const clearFilters = () => {
+    onFilterChange({ type: "all", status: "all", search: "" });
+  };
+
+  return (
+    <div className="flex flex-col sm:flex-row gap-2">
+      <div className="relative flex-1 max-w-xs">
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+        <Input
+          placeholder="Search vessels..."
+          value={filters.search}
+          onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
+          className="pl-8 h-9 text-sm"
+        />
+      </div>
+
+      <Select value={filters.type} onValueChange={(v) => onFilterChange({ ...filters, type: v })}>
+        <SelectTrigger className="w-44 h-9 text-sm">
+          <SelectValue placeholder="Type" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Types</SelectItem>
+          {VESSEL_TYPES.map(t => (
+            <SelectItem key={t} value={t}>
+              {t.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      <Select value={filters.status} onValueChange={(v) => onFilterChange({ ...filters, status: v })}>
+        <SelectTrigger className="w-36 h-9 text-sm">
+          <SelectValue placeholder="Status" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All</SelectItem>
+          <SelectItem value="active">Active</SelectItem>
+          <SelectItem value="inactive">Inactive</SelectItem>
+          <SelectItem value="drydock">Drydock</SelectItem>
+        </SelectContent>
+      </Select>
+
+      {hasActiveFilters && (
+        <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9 px-3 text-slate-500">
+          <X className="w-3.5 h-3.5 mr-1" />
+          Clear
+        </Button>
+      )}
+    </div>
+  );
+}
